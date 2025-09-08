@@ -1,16 +1,26 @@
 using Microsoft.EntityFrameworkCore;
 using PantryManagementSystem.Data;
+using PantryManagementSystem.Repositories;
+using PantryManagementSystem.Repositories.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+// For swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+
 // Registering Database
 builder.Services.AddDbContext<PantryDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("ApplicationDbString")));
 
 
+
+// Register Repositories
+builder.Services.AddScoped<IPantryItemRepository, PantryItemRepository>();
 
 var app = builder.Build();
 
@@ -22,10 +32,17 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+// Enable Swagger for all enviroments
+app.UseSwagger();
+app.UseSwaggerUI();
+
 app.UseHttpsRedirection();
+
+
 app.UseRouting();
 
 app.UseAuthorization();
+app.MapControllers();
 
 app.MapStaticAssets();
 

@@ -1,0 +1,94 @@
+﻿/* Card Container */
+.card-custom {
+    border-radius: 12px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    background: linear-gradient(135deg, #ffffff, #f7f7f7);
+}
+
+    /* Hover Effect */
+    .card-custom:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+/* Top-left Category Badge */
+.badge-category {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 3px 10px;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    background: linear-gradient(45deg, #6a11cb, #2575fc);
+    color: white;
+    font-weight: bold;
+}
+
+/* Top-right Quantity Badge */
+.badge-quantity {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 3px 10px; 
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: white;
+}
+
+    .badge-quantity.green {
+        background-color: #28a745;
+    }
+
+    .badge-quantity.red {
+        background-color: #dc3545;
+    }
+
+/* Card Title Styling */
+.card-title {
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Card Text Font */
+.card-text {
+    font-size: 0.95rem;
+}
+
+/* Card Footer Icons */
+.card-footer a {
+    font-size: 1rem;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    text-decoration: none;
+}
+
+    .card-footer a:hover {
+        opacity: 0.8;
+    }
+
+/* Container padding */
+.container-custom {
+    padding: 30px 15px;
+    background: linear-gradient(120deg, #f5f7fa, #e9eff5);
+    border-radius: 12px;
+}
+
+/* Heading Row */
+.heading-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.card-body {
+    padding-top: 40px; /* Add enough top padding so category badge doesn't overlap title */
+    position: relative;
+}
