@@ -1,7 +1,16 @@
+using Microsoft.EntityFrameworkCore;
+using PantryManagementSystem.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Registering Database
+builder.Services.AddDbContext<PantryDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("ApplicationDbString")));
+
+
 
 var app = builder.Build();
 
