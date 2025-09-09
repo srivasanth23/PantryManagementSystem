@@ -12,7 +12,7 @@ namespace PantryManagementSystem.Controllers
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly ITokenRepository _tokenRepo;
-        private readonly string DefaultRole = "Admin";
+        private readonly string DefaultRole = "User";
 
         public AuthController(UserManager<IdentityUser> userManager, ITokenRepository tokenRepo)
         {

@@ -6,7 +6,7 @@ using PantryManagementSystem.Repositories.Interfaces;
 
 namespace PantryManagementSystem.Controllers
 {
-    [Authorize(Roles = "Admin,Staff")]
+    //[Authorize(Roles = "Admin,Staff")]
     public class PantryItemController : Controller
     {
         private readonly IPantryItemRepository _repository;
@@ -16,6 +16,7 @@ namespace PantryManagementSystem.Controllers
             _repository = repository;
         }
 
+        [Authorize(Roles = "Admin,Staff,User")]
         // GET: PantryItem
         public async Task<IActionResult> Index()
         {
@@ -33,6 +34,7 @@ namespace PantryManagementSystem.Controllers
             return View(dtos);
         }
 
+        [Authorize(Roles = "Admin,Staff,User")]
         // GET: PantryItem/Details/{id}
         public async Task<IActionResult> Details(Guid id)
         {
@@ -52,6 +54,7 @@ namespace PantryManagementSystem.Controllers
             return View(dto);
         }
 
+        [Authorize(Roles = "Admin,Staff")]
         // GET: PantryItem/Create
         public IActionResult Create()
         {
@@ -59,6 +62,7 @@ namespace PantryManagementSystem.Controllers
             return View();
         }
 
+        [Authorize(Roles = "Admin,Staff")]
         // POST: PantryItem/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -83,6 +87,7 @@ namespace PantryManagementSystem.Controllers
             return RedirectToAction("Index");
         }
 
+        [Authorize(Roles = "Admin,Staff")]
         // GET: PantryItem/Edit/{id}
         public async Task<IActionResult> Edit(Guid id)
         {
@@ -103,6 +108,7 @@ namespace PantryManagementSystem.Controllers
             return View(dto);
         }
 
+        [Authorize(Roles = "Admin,Staff")]
         // POST: PantryItem/Edit/{id}
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -126,6 +132,8 @@ namespace PantryManagementSystem.Controllers
             await _repository.UpdateAsync(item);
             return RedirectToAction("Index");
         }
+
+        [Authorize(Roles = "Admin,Staff")]
         // GET: PantryItem/Delete/{id}
         public async Task<IActionResult> Delete(Guid id)
         {
