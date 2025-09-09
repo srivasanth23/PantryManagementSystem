@@ -6,7 +6,7 @@ using PantryManagementSystem.Repositories.Interfaces;
 
 namespace PantryManagementSystem.Controllers
 {
-    //[Authorize(Roles = "Admin,Staff")]
+    [Authorize(Roles = "Admin,Staff")]
     public class PantryItemController : Controller
     {
         private readonly IPantryItemRepository _repository;

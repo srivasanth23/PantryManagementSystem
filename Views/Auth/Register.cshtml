@@ -1,0 +1,49 @@
+﻿@model PantryManagementSystem.Models.DTO.RegisterRequestDTO
+
+@{
+    ViewData["Title"] = "Register";
+}
+
+<div class="container container-custom my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow-sm card-custom p-4">
+                <div class="card-header text-white text-center mb-3" style="background: linear-gradient(135deg, #2575fc, #6a11cb); border-radius: 12px 12px 0 0;">
+                    <h3>Register</h3>
+                </div>
+
+                @if (TempData["Message"] != null)
+                {
+                    <div class="alert alert-success">@TempData["Message"]</div>
+                }
+
+                <form asp-action="Register" method="post">
+                    <div class="mb-3">
+                        <label asp-for="Username" class="form-label"></label>
+                        <input asp-for="Username" class="form-control" />
+                        <span asp-validation-for="Username" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Password" class="form-label"></label>
+                        <input asp-for="Password" type="password" class="form-control" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-center mt-4">
+                        <button type="submit" class="btn btn-success me-2">
+                            <i class="fa-solid fa-user-plus me-1"></i> Register
+                        </button>
+                        <a asp-action="Login" class="btn btn-outline-secondary">
+                            <i class="fa-solid fa-right-to-bracket me-1"></i> Login
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
