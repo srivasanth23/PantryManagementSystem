@@ -18,7 +18,7 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-controller="Home" asp-action="Index">PantryManagementSystem</a>
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index"> DotWings Pantry </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
                         aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -27,24 +27,52 @@
                 <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between">
                     <!-- Left side links -->
                     <ul class="navbar-nav me-auto mb-2 mb-sm-0">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="PantryItem" asp-action="Index">Pantry</a>
-                        </li>
+                        @{
+                            var user = HttpContextAccessor.HttpContext?.User;
+                            var isAuthenticated = user?.Identity?.IsAuthenticated ?? false;
+                            var isAdmin = user?.IsInRole("Admin") ?? false;
+                            var isStaff = user?.IsInRole("Staff") ?? false;
+                            var isUser = user?.IsInRole("User") ?? false;
+
+                            if (isAuthenticated)
+                            {
+                                if (isAdmin)
+                                {
+                                    <!-- Admin Navbar -->
+                                    <li class="nav-item"><a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Home</a></li>
+                                    <li class="nav-item"><a class="nav-link text-dark" asp-controller="PantryItem" asp-action="Index">Pantry Items</a></li>
+                                    <li class="nav-item"><a class="nav-link text-dark" asp-controller="Order" asp-action="Index">Orders</a></li>
+                                    <li class="nav-item"><a class="nav-link text-dark" asp-controller="Billing" asp-action="Index">Billing</a></li>
+                                    <li class="nav-item"><a class="nav-link text-dark" asp-controller="Reports" asp-action="Index">Reports</a></li>
+                                }
+                                else if (isStaff)
+                                {
+                                    <!-- Staff Navbar -->
+                                    <li class="nav-item"><a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Home</a></li>
+                                    <li class="nav-item"><a class="nav-link text-dark" asp-controller="PantryItem" asp-action="Index">Pantry Items</a></li>
+                                    <li class="nav-item"><a class="nav-link text-dark" asp-controller="Order" asp-action="Index">Orders</a></li>
+                                    <li class="nav-item"><a class="nav-link text-dark" asp-controller="Billing" asp-action="Index">Billing</a></li>
+                                }
+                                else if (isUser)
+                                {
+                                    <!-- User Navbar -->
+                                    <li class="nav-item"><a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Home</a></li>
+                                    <li class="nav-item"><a class="nav-link text-dark" asp-controller="PantryItem" asp-action="Index">Pantry Items</a></li>
+                                    <li class="nav-item"><a class="nav-link text-dark" asp-controller="Order" asp-action="MyOrders">My Orders</a></li>
+                                    <li class="nav-item"><a class="nav-link text-dark" asp-controller="Billing" asp-action="MyBills">My Bills</a></li>
+                                }
+                            }
+                            else
+                            {
+                                <!-- Guest Navbar -->
+                                <li class="nav-item"><a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Home</a></li>
+                                // <li class="nav-item"><a class="nav-link text-dark" asp-controller="Home" asp-action="Privacy">Privacy</a></li>
+                            }
+                        }
                     </ul>
 
                     <!-- Right side auth links -->
                     <ul class="navbar-nav ms-auto mb-2 mb-sm-0">
-                        @{
-                            var user = HttpContextAccessor.HttpContext?.User;
-                            var isAuthenticated = user?.Identity?.IsAuthenticated ?? false;
-                        }
-
                         @if (isAuthenticated)
                         {
                             <li class="nav-item me-2">
@@ -88,7 +116,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2025 - PantryManagementSystem -
+            &copy; 2025 - DotWings Pantry -
             <a asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
