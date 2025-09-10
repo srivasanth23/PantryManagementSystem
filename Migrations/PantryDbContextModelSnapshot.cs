@@ -22,6 +22,53 @@ namespace PantryManagementSystem.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Order", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("IssuedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("PantryItemId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("RequestDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("Pending");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PantryItemId");
+
+                    b.ToTable("Orders");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("aca1f837-fba7-42d2-ae01-7f25ccfc1653"),
+                            PantryItemId = new Guid("91555176-1298-4383-8e3e-bb0695861ee7"),
+                            Quantity = 2,
+                            RequestDate = new DateTime(2025, 9, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Status = "Pending",
+                            UserId = "20e32654-1f4f-4e36-8c1d-7a805d5218dd"
+                        });
+                });
+
             modelBuilder.Entity("PantryManagementSystem.Models.Domain.Billing", b =>
                 {
                     b.Property<Guid>("Id")
@@ -53,52 +100,6 @@ namespace PantryManagementSystem.Migrations
                             GeneratedDate = new DateTime(2025, 9, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Month = "Sep-2025",
                             TotalAmount = 40m,
-                            UserId = new Guid("20e32654-1f4f-4e36-8c1d-7a805d5218dd")
-                        });
-                });
-
-            modelBuilder.Entity("PantryManagementSystem.Models.Domain.Order", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("IssuedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("PantryItemId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("RequestDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
-                        .HasDefaultValue("Pending");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PantryItemId");
-
-                    b.ToTable("Orders");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("aca1f837-fba7-42d2-ae01-7f25ccfc1653"),
-                            PantryItemId = new Guid("91555176-1298-4383-8e3e-bb0695861ee7"),
-                            Quantity = 2,
-                            RequestDate = new DateTime(2025, 9, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Status = "Pending",
                             UserId = new Guid("20e32654-1f4f-4e36-8c1d-7a805d5218dd")
                         });
                 });
@@ -153,7 +154,7 @@ namespace PantryManagementSystem.Migrations
                         });
                 });
 
-            modelBuilder.Entity("PantryManagementSystem.Models.Domain.Order", b =>
+            modelBuilder.Entity("Order", b =>
                 {
                     b.HasOne("PantryManagementSystem.Models.Domain.PantryItem", "PantryItem")
                         .WithMany("Orders")

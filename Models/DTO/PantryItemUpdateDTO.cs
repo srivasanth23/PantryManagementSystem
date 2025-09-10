@@ -6,7 +6,7 @@ namespace PantryManagementSystem.Models.DTO
     public class PantryItemUpdateDTO
     {
         [Required]
-        public Guid Id { get; set; } // Needed for updating
+        public Guid Id { get; set; }                                        // Needed for updating
 
         [Required, MaxLength(100)]
         public string Name { get; set; }
