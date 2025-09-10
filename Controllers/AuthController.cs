@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using PantryManagementSystem.Models.DTO;
 using PantryManagementSystem.Repositories;
-using PantryManagementSystem.Repositories.Interfaces;
 using System.Security.Claims;
 
 namespace PantryManagementSystem.Controllers
@@ -13,7 +12,7 @@ namespace PantryManagementSystem.Controllers
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly ITokenRepository _tokenRepo;
-        private readonly string DefaultRole = "Staff";
+        private readonly string DefaultRole = "User";
 
         public AuthController(UserManager<IdentityUser> userManager, ITokenRepository tokenRepo)
         {

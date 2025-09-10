@@ -1,0 +1,30 @@
+﻿@model PantryManagementSystem.Models.DTO.RequestOrderDTO
+
+<div class="container my-5">
+    <h2>Request Pantry Item</h2>
+    <div class="card shadow-sm p-4">
+        <h4>@Model.Name</h4>
+        <p><strong>Price:</strong> ₹@Model.Price</p>
+        <p><strong>Available Quantity:</strong> @Model.AvailableQuantity</p>
+        <p><strong>Expiry Date:</strong> @Model.ExpiryDate.ToString("dd MMM yyyy")</p>
+
+        <form asp-action="RequestOrder" method="post">
+            <input type="hidden" asp-for="Id" />
+
+            <div class="mb-3">
+                <label asp-for="Quantity" class="form-label">Quantity to Request</label>
+                <input asp-for="Quantity" class="form-control" type="number" min="1" max="@Model.AvailableQuantity" required />
+                <span asp-validation-for="Quantity" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-success">
+                <i class="fa-solid fa-cart-plus me-1"></i> Request Item
+            </button>
+            <a asp-action="Browse" class="btn btn-secondary ms-2">Cancel</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

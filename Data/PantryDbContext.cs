@@ -53,7 +53,7 @@ namespace PantryManagementSystem.Data
             var order = new Order
             {
                 Id = Guid.Parse("aca1f837-fba7-42d2-ae01-7f25ccfc1653"),
-                UserId = "20e32654-1f4f-4e36-8c1d-7a805d5218dd", 
+                UserId = Guid.Parse("20e32654-1f4f-4e36-8c1d-7a805d5218dd"), 
                 PantryItemId = Guid.Parse("91555176-1298-4383-8e3e-bb0695861ee7"),
                 Quantity = 2,
                 Status = OrderStatus.Pending,

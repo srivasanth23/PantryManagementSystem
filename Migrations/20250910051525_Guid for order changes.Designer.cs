@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PantryManagementSystem.Data;
 
@@ -11,9 +12,11 @@ using PantryManagementSystem.Data;
 namespace PantryManagementSystem.Migrations
 {
     [DbContext(typeof(PantryDbContext))]
-    partial class PantryDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250910051525_Guid for order changes")]
+    partial class Guidfororderchanges
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

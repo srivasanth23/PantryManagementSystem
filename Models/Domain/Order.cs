@@ -4,7 +4,7 @@ using PantryManagementSystem.Models.Enums;
 public class Order
 {
     public Guid Id { get; set; }
-    public string UserId { get; set; } // must be string
+    public Guid UserId { get; set; } // keep as Guid
     public Guid PantryItemId { get; set; }
     public PantryItem PantryItem { get; set; }
     public int Quantity { get; set; }
