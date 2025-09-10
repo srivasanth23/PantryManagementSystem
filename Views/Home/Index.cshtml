@@ -2,7 +2,287 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+@using Microsoft.AspNetCore.Http
+@using PantryManagementSystem.Models.Enums
+@inject IHttpContextAccessor HttpContextAccessor
+@model PantryManagementSystem.Models.ViewModels.HomeViewModel
+
+@{
+    var user = HttpContextAccessor.HttpContext?.User;
+    var isAuthenticated = user?.Identity?.IsAuthenticated ?? false;
+    var isAdmin = user?.IsInRole("Admin") ?? false;
+    var isStaff = user?.IsInRole("Staff") ?? false;
+    var isUser = user?.IsInRole("User") ?? false;
+}
+
+<!-- Hero Section -->
+<div class="hero-banner text-white d-flex align-items-center justify-content-center position-relative"
+     style="height: 300px; overflow:hidden;">
+
+    <!-- Background Image -->
+    <img src="~/images/pantry-hero.jpeg" alt="Pantry Background"
+         class="position-absolute w-100 h-100"
+         style="object-fit: cover; z-index:0;" />
+
+    <!-- Gradient Text -->
+    <h1 class="display-3 fw-bold position-relative" style="z-index:2;">
+        Welcome to DotWings Pantry
+    </h1>
 </div>
+
+
+
+<div class="container my-5">
+    @if (!isAuthenticated)
+    {
+        <!-- Guest View -->
+        <div class="text-center">
+            <p class="lead mb-4">Please login or register to access the pantry system.</p>
+            <a class="btn btn-primary me-2" asp-controller="Auth" asp-action="Login">
+                <i class="fa-solid fa-right-to-bracket"></i> Login
+            </a>
+            <a class="btn btn-outline-primary" asp-controller="Auth" asp-action="Register">
+                <i class="fa-solid fa-user-plus"></i> Register
+            </a>
+        </div>
+    }
+    else if (isUser)
+    {
+        <!-- USER DASHBOARD -->
+        <div class="mb-4">
+            <form method="get" asp-controller="PantryItem" asp-action="Index">
+                <div class="input-group">
+                    <input type="text" class="form-control" name="searchTerm" placeholder="Search pantry items..." value="@ViewBag.SearchTerm" />
+                    <button class="btn btn-primary" type="submit"><i class="fa fa-search"></i></button>
+                </div>
+            </form>
+        </div>
+
+
+        @foreach (PantryCategory category in Enum.GetValues(typeof(PantryCategory)))
+        {
+            var itemsInCategory = Model.PantryItems
+            .Where(x => x.Category == category.ToString())
+            .ToList();
+
+            if (itemsInCategory.Any())
+            {
+                <div class="category-section p-3 mb-4 rounded">
+                    <h4 class="mb-3">@category</h4>
+                    <div class="row row-cols-1 row-cols-md-3 g-4 mb-4">
+                        @foreach (var item in itemsInCategory)
+                        {
+                            var daysLeft = (item.ExpiryDate - DateTime.Now).TotalDays;
+                            bool lowStock = item.Quantity <= 5;
+                            bool expirySoon = daysLeft <= 10;
+
+                            <div class="col">
+                                <div class="card card-custom h-100 shadow-sm position-relative">
+                                    <!-- Quantity Badge -->
+                                    <span class="position-absolute top-0 end-0 badge rounded-pill m-2 @(item.Quantity > 0 ? "bg-success" : "bg-danger")">
+                                        @item.Quantity
+                                    </span>
+
+                                    <!-- Category Badge -->
+                                    <span class="position-absolute top-0 start-0 badge rounded-pill m-2"
+                                          style="background: linear-gradient(135deg, #36d1dc, #5b86e5); color:white;">
+                                        @item.Category
+                                    </span>
+
+                                    <div class="card-body">
+                                        <h5 class="card-title mt-4">@item.Name</h5>
+                                        <p class="card-text"><strong>Price:</strong> ₹@item.Price</p>
+                                        <p class="card-text"><strong>Expiry:</strong> @item.ExpiryDate.ToString("dd MMM yyyy")</p>
+
+                                        @if (expirySoon)
+                                        {
+                                            <span class="badge bg-warning me-1">Expiry Soon</span>
+                                        }
+                                        @if (lowStock)
+                                        {
+                                            <span class="badge bg-danger">Low Stock</span>
+                                        }
+                                    </div>
+
+                                    <div class="card-footer d-flex justify-content-center">
+                                        <button type="button" class="btn btn-success btn-sm rounded-pill px-3"
+                                                onclick="location.href='@Url.Action("RequestOrder", "Order", new { id = item.Id })'">
+                                            <i class="fa-solid fa-cart-plus me-1"></i> Request
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+            }
+        }
+    }
+    else if (isStaff)
+    {
+        <!-- STAFF DASHBOARD -->
+        <div class="container my-4">
+
+            <!-- Stock Overview -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-4">
+                    <div class="card card-custom shadow-sm text-center p-3">
+                        <h6>Total Items</h6>
+                        <h3 class="fw-bold">@Model.AllItems.Count()</h3>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card card-custom shadow-sm text-center p-3">
+                        <h6>Total Quantity</h6>
+                        <h3 class="fw-bold">@Model.AllItems.Sum(x => x.Quantity)</h3>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card card-custom shadow-sm text-center p-3">
+                        <h6>Categories</h6>
+                        <h3 class="fw-bold">@Model.AllItems.Select(x => x.Category).Distinct().Count()</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Low Stock Items -->
+            @if (Model.LowStockItems != null && Model.LowStockItems.Any())
+            {
+                <h5 class="mb-3 text-danger">⚠️ Low Stock Items</h5>
+                <div class="row row-cols-1 row-cols-md-3 g-4 mb-4">
+                    @foreach (var item in Model.LowStockItems)
+                    {
+                        <div class="col">
+                            <div class="card card-custom h-100 shadow-sm border-danger">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">@item.Name</h6>
+                                    <p class="text-muted mb-1">@item.Category</p>
+                                    <p class="text-danger fw-bold">Only @item.Quantity left!</p>
+                                    <p class="text-warning mb-1">
+                                        Expiry: @item.ExpiryDate.ToString("dd MMM yyyy")
+                                        @if ((item.ExpiryDate - DateTime.Now).TotalDays <= 10)
+                                        {
+                                            <span class="badge bg-warning ms-1">Expiry Soon</span>
+                                        }
+                                    </p>
+                                    <a asp-controller="PantryItem" asp-action="Edit" asp-route-id="@item.Id"
+                                       class="btn btn-sm btn-outline-danger">Update</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+
+            <!-- Expiring Soon Items -->
+            @if (Model.ExpiringItems != null && Model.ExpiringItems.Any())
+            {
+                <h5 class="mb-3 text-warning">🕒 Items Expiring Soon</h5>
+                <div class="row row-cols-1 row-cols-md-3 g-4 mb-4">
+                    @foreach (var item in Model.ExpiringItems)
+                    {
+                        <div class="col">
+                            <div class="card card-custom h-100 shadow-sm border-warning">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">@item.Name</h6>
+                                    <p class="text-muted mb-1">@item.Category</p>
+                                    <p class="fw-bold text-warning">
+                                        Expires in @( (int)(item.ExpiryDate - DateTime.Now).TotalDays ) days
+                                    </p>
+                                    <a asp-controller="PantryItem" asp-action="Edit" asp-route-id="@item.Id"
+                                       class="btn btn-sm btn-outline-warning">Update</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+
+            <!-- Quick Actions -->
+            <div class="d-flex gap-3 mt-4 flex-wrap">
+                <a class="btn btn-primary" asp-controller="Order" asp-action="MyOrders">
+                    <i class="fa-solid fa-cart-plus me-1"></i> Process Orders
+                </a>
+                <a class="btn btn-warning" asp-controller="Billing" asp-action="Index">
+                    <i class="fa-solid fa-credit-card me-1"></i> Billing
+                </a>
+                @* <a class="btn btn-success" asp-controller="PantryItem" asp-action="Create">
+                    <i class="fa-solid fa-plus me-1"></i> Add New Item
+                </a> *@
+            </div>
+        </div>
+
+    }
+    else if (isAdmin)
+    {
+        <!-- ADMIN DASHBOARD -->
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3">
+                <div class="list-group shadow-sm">
+                    <a class="list-group-item list-group-item-action" asp-controller="PantryItem" asp-action="Index">📦 Pantry Items</a>
+                    <a class="list-group-item list-group-item-action" asp-controller="Order" asp-action="AllOrders">🧾 Orders</a>
+                    <a class="list-group-item list-group-item-action" asp-controller="Billing" asp-action="AllBills">💳 Billing</a>
+                    <a class="list-group-item list-group-item-action" asp-controller="Report" asp-action="ConsumptionReport">📊 Reports</a>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="col-md-9">
+                <div class="row g-4 mb-4">
+                    <div class="col-md-4">
+                        <div class="card card-custom shadow-sm border-0 text-center">
+                            <div class="card-body">
+                                <h5>Total Orders</h5>
+                                <h2 class="fw-bold">@Model.TotalOrders</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card card-custom shadow-sm border-0 text-center">
+                            <div class="card-body">
+                                <h5>Low Stock</h5>
+                                <h2 class="fw-bold text-danger">@Model.LowStockCount</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card card-custom shadow-sm border-0 text-center">
+                            <div class="card-body">
+                                <h5>Revenue</h5>
+                                <h2 class="fw-bold text-success">₹@Model.TotalRevenue</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reports -->
+                <div class="mt-4 card card-custom shadow-sm p-3">
+                    <h5 class="mb-3">Popular Items</h5>
+                    <canvas id="popularItemsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        var ctx = document.getElementById('popularItemsChart');
+        if (ctx) {
+            var chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: @Html.Raw(Json.Serialize(Model.PopularItemNames ?? new List<string>())),
+                    datasets: [{
+                        label: 'Popular Items',
+                        data: @Html.Raw(Json.Serialize(Model.PopularItemCounts ?? new List<int>())),
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)'
+                    }]
+                }
+            });
+        }
+    </script>
+}

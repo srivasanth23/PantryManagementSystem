@@ -12,8 +12,8 @@ using PantryManagementSystem.Data;
 namespace PantryManagementSystem.Migrations
 {
     [DbContext(typeof(PantryDbContext))]
-    [Migration("20250910034050_Initial")]
-    partial class Initial
+    [Migration("20250910064604_Inital Creation")]
+    partial class InitalCreation
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -50,9 +50,8 @@ namespace PantryManagementSystem.Migrations
                         .HasColumnType("nvarchar(20)")
                         .HasDefaultValue("Pending");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -68,7 +67,7 @@ namespace PantryManagementSystem.Migrations
                             Quantity = 2,
                             RequestDate = new DateTime(2025, 9, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Status = "Pending",
-                            UserId = "20e32654-1f4f-4e36-8c1d-7a805d5218dd"
+                            UserId = new Guid("20e32654-1f4f-4e36-8c1d-7a805d5218dd")
                         });
                 });
 

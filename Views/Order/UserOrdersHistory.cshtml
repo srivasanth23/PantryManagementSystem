@@ -1,18 +1,18 @@
-﻿@* Admin – All Orders *@
-@model IEnumerable<PantryManagementSystem.Models.DTO.OrderReadDTO>
+﻿@* Main user-facing history page → shows all orders a user has placed *@
 
+@model List<PantryManagementSystem.Models.DTO.MyOrderDTO>
 @{
-    ViewData["Title"] = "All Orders (Admin)";
+    ViewData["Title"] = "My Orders History";
 }
 
 <div class="container container-custom my-5">
     <div class="row justify-content-center">
-        <div class="col-md-11">
+        <div class="col-md-10">
             <div class="card shadow-sm card-custom">
                 <!-- Card Header -->
                 <div class="card-header text-white text-center mb-3"
-                     style="background: linear-gradient(135deg, #11998e, #38ef7d); border-radius: 12px 12px 0 0;">
-                    <h3>All Orders</h3>
+                     style="background: linear-gradient(135deg, #6a11cb, #2575fc); border-radius: 12px 12px 0 0;">
+                    <h3>My Orders History</h3>
                 </div>
 
                 <div class="card-body">
@@ -30,11 +30,11 @@
                         <thead class="table-dark">
                             <tr>
                                 <th>Order Id</th>
-                                <th>User Id</th>
                                 <th>Item</th>
                                 <th>Quantity</th>
                                 <th>Status</th>
                                 <th>Requested Date</th>
+                                <th>Issued Date</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -50,7 +50,6 @@
                                 {
                                     <tr>
                                         <td>@order.Id</td>
-                                        <td>@order.UserId</td>
                                         <td>@order.PantryItemName</td>
                                         <td>@order.Quantity</td>
                                         <td>
@@ -76,6 +75,7 @@
                                             }
                                         </td>
                                         <td>@order.RequestDate.ToString("dd-MMM-yyyy")</td>
+                                        <td>@(order.IssuedDate.HasValue? order.IssuedDate.Value.ToString("dd-MMM-yyyy") : "-")</td>
                                     </tr>
                                 }
                             }

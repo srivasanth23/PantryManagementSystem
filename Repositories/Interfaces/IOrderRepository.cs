@@ -11,17 +11,22 @@ namespace PantryManagementSystem.Repositories.Interfaces
         // Browse available pantry items
         Task<IEnumerable<PantryItem>> BrowseAsync();
 
-        // Request an item
+        // Request an item - PLace an order 
         Task<Order> RequestItemAsync(Guid userId, Guid pantryItemId, int quantity);
 
         // Get orders of a specific user
         Task<IEnumerable<Order>> GetMyOrdersAsync(Guid userId);
+
+        // Get all approved orders for a specific user
+        Task<IEnumerable<Order>> GetApprovedOrdersAsync(Guid userId);
 
         // Get all orders with user email
         Task<IEnumerable<OrderReadDTO>> GetAllOrdersAsync();
 
         // Get all orders for staff view
         Task<IEnumerable<MyOrderDTO>> GetAllOrdersForStaffAsync();
+
+
 
         // Approve an order
         Task<Order> ApproveOrderAsync(Guid orderId);

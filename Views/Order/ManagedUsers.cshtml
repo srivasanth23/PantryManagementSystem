@@ -1,0 +1,63 @@
+﻿@model List<PantryManagementSystem.Models.DTO.MyOrderDTO>
+
+@{
+    ViewData["Title"] = "Manage Orders";
+}
+
+<h2>Manage Orders</h2>
+
+@if (!Model.Any())
+{
+    <p>No pending orders available.</p>
+}
+else
+{
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Item Name</th>
+                <th>Quantity</th>
+                <th>Status</th>
+                <th>Request Date</th>
+                <th>Issued Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var order in Model)
+            {
+                <tr>
+                    <td>@order.PantryItemName</td>
+                    <td>@order.Quantity</td>
+                    <td>@order.Status</td>
+                    <td>@order.RequestDate.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>
+                        @(order.IssuedDate.HasValue
+                                        ? order.IssuedDate.Value.ToString("dd/MM/yyyy HH:mm")
+                                        : "-")
+            </td>
+            <td>
+                @if (order.Status == "Pending")
+                        {
+                            <div class="d-flex gap-2">
+                                <form asp-action="Approve" method="post" style="display:inline;">
+                                    <input type="hidden" name="orderId" value="@order.Id" />
+                                    <button type="submit" class="btn btn-success btn-sm">Accept</button>
+                                </form>
+
+                                <form asp-action="Deny" method="post" style="display:inline;">
+                                    <input type="hidden" name="orderId" value="@order.Id" />
+                                    <button type="submit" class="btn btn-danger btn-sm">Decline</button>
+                                </form>
+                            </div>
+                        }
+                        else
+                        {
+                            <span>-</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

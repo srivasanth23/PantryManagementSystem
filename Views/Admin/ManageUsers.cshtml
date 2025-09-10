@@ -1,0 +1,68 @@
+﻿@using Microsoft.AspNetCore.Identity
+@model List<(IdentityUser User, IList<string> Roles)>
+
+@{
+    ViewData["Title"] = "Manage Users";
+}
+
+<div class="container container-custom my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-sm card-custom">
+                <!-- Card Header -->
+                <div class="card-header text-white text-center mb-3"
+                     style="background: linear-gradient(135deg, #6a11cb, #2575fc); border-radius: 12px 12px 0 0;">
+                    <h3>Manage Users</h3>
+                </div>
+
+                <div class="card-body">
+                    @if (TempData["Message"] != null)
+                    {
+                        <div class="alert alert-success">@TempData["Message"]</div>
+                    }
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger">@TempData["Error"]</div>
+                    }
+
+                    <!-- Users Table -->
+                    <table class="table table-hover align-middle text-center">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>UserName</th>
+                                <th>Email</th>
+                                <th>Current Role</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var entry in Model)
+                            {
+                                <tr>
+                                    <td>@entry.User.UserName?.Split('@')[0]</td>
+                                    <td>@entry.User.Email</td>
+                                    <td>@(entry.Roles.Any() ? string.Join(", ", entry.Roles) : "No Role")</td>
+                                    <td>
+                                        <a asp-action="ManageUserRoles" asp-route-userId="@entry.User.Id"
+                                           class="btn btn-sm btn-primary me-1">
+                                            <i class="fa-solid fa-user-gear me-1"></i> Manage Role
+                                        </a>
+
+                                        <form asp-action="DeleteUser" asp-route-userId="@entry.User.Id"
+                                              method="post" style="display:inline;">
+                                            <button type="submit" class="btn btn-sm btn-danger"
+                                                    onclick="return confirm('Are you sure you want to delete @entry.User.UserName ?');">
+                                                <i class="fa-solid fa-trash me-1"></i> Delete
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+
+                            }
+                        </tbody>
+                    </table>
+                </div> <!-- card-body -->
+            </div> <!-- card -->
+        </div> <!-- col -->
+    </div> <!-- row -->
+</div>

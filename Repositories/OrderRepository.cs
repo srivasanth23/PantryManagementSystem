@@ -26,16 +26,18 @@ namespace PantryManagementSystem.Repositories
                 .ToListAsync();
         }
 
+        // Creates and saves order in DB
         public async Task<Order> RequestItemAsync(Guid userId, Guid pantryItemId, int quantity)
         {
-            var item = await _context.PantryItems.FindAsync(pantryItemId);
-            if (item == null || item.Quantity < quantity) return null;
+            var pantryItem = await _context.PantryItems.FindAsync(pantryItemId);
+            if (pantryItem == null || pantryItem.Quantity < quantity)
+                return null;
 
             var order = new Order
             {
                 Id = Guid.NewGuid(),
-                UserId = userId,
                 PantryItemId = pantryItemId,
+                UserId = userId,   // ✅ assign directly, UserId is Guid
                 Quantity = quantity,
                 Status = OrderStatus.Pending,
                 RequestDate = DateTime.Now
@@ -43,10 +45,10 @@ namespace PantryManagementSystem.Repositories
 
             _context.Orders.Add(order);
             await _context.SaveChangesAsync();
-
             return order;
         }
 
+        // Fetches orders for a user - Fetches orders for a specific user
         public async Task<IEnumerable<Order>> GetMyOrdersAsync(Guid userId)
         {
             return await _context.Orders
@@ -56,7 +58,7 @@ namespace PantryManagementSystem.Repositories
                 .ToListAsync();
         }
 
-        // ✅ Get All Orders with User Email
+        // Get All Orders with User Email - with User + Pantry item 
         public async Task<IEnumerable<OrderReadDTO>> GetAllOrdersAsync()
         {
             var orders = await _context.Orders
@@ -87,6 +89,7 @@ namespace PantryManagementSystem.Repositories
             return result;
         }
 
+        // Get all the orders for staff view / admin view
         public async Task<IEnumerable<MyOrderDTO>> GetAllOrdersForStaffAsync()
         {
             var orders = await _context.Orders
@@ -112,7 +115,7 @@ namespace PantryManagementSystem.Repositories
             return result;
         }
 
-
+        // Updates the Order -> Status
         public async Task<Order> ApproveOrderAsync(Guid orderId)
         {
             var order = await _context.Orders.Include(o => o.PantryItem).FirstOrDefaultAsync(o => o.Id == orderId);
@@ -120,11 +123,23 @@ namespace PantryManagementSystem.Repositories
 
             order.Status = OrderStatus.Approved;
             order.IssuedDate = DateTime.UtcNow;
+
+            // Update pantry quantity
             order.PantryItem.Quantity -= order.Quantity;
 
             await _context.SaveChangesAsync();
             return order;
         }
+
+        public async Task<IEnumerable<Order>> GetApprovedOrdersAsync(Guid userId)
+        {
+            return await _context.Orders
+                .Include(o => o.PantryItem)
+                .Where(o => o.UserId == userId && o.Status == OrderStatus.Approved)
+                .OrderByDescending(o => o.RequestDate)
+                .ToListAsync();
+        }
+
 
         public async Task<Order> DenyOrderAsync(Guid orderId)
         {
@@ -158,6 +173,8 @@ namespace PantryManagementSystem.Repositories
             return await _context.Orders
                 .Include(o => o.PantryItem)
                 .FirstOrDefaultAsync(o => o.Id == orderId);
+
         }
+
     }
 }

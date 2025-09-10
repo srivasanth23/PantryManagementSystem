@@ -29,3 +29,24 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+
+body {
+    background: linear-gradient(135deg, #f9f9f9, #eef2f3);
+    min-height: 100vh;
+}
+
+/* Reusable card style */
+.card-custom {
+    border-radius: 16px;
+    transition: transform 0.2s ease-in-out;
+}
+
+    .card-custom:hover {
+        transform: translateY(-5px);
+    }
+
+
+.category-section {
+    background-color: #e9f5ff; /* light blue */
+    border-radius: 12px;
+}

@@ -1,0 +1,63 @@
+﻿@model PantryManagementSystem.Models.DTO.ManageUserRolesViewModel
+
+@{
+    ViewData["Title"] = "Manage User Role";
+}
+
+<div class="container container-custom my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm card-custom">
+                <!-- Card Header -->
+                <div class="card-header text-white d-flex justify-content-between align-items-center"
+                     style="background: linear-gradient(135deg, #6a11cb, #2575fc); border-radius: 12px 12px 0 0;">
+                    <h3 class="mb-0">Manage Role</h3>
+                    <span class="fw-bold">User: @Model.UserName?.Split('@')[0]</span>
+                </div>
+
+                <div class="card-body">
+                    <!-- Show username + email -->
+                    <p class="mb-4">
+                        <strong>Username:</strong> @Model.UserName?.Split('@')[0] <br />
+                        <strong>Email:</strong> @Model.UserName
+                    </p>
+
+                    <form asp-action="ManageUserRoles" method="post">
+                        <input type="hidden" asp-for="UserId" />
+
+                        <!-- Roles Table -->
+                        <table class="table table-hover align-middle text-center">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Role</th>
+                                    <th>Select</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var role in Model.Roles)
+                                {
+                                    <tr>
+                                        <td>@role.RoleName</td>
+                                        <td>
+                                            <input type="radio" name="SelectedRole" value="@role.RoleName"
+                                                   @(role.IsSelected ? "checked" : "") />
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+
+                        <div class="d-flex justify-content-center mt-4">
+                            <button type="submit" class="btn btn-success me-2">
+                                <i class="fa-solid fa-floppy-disk me-1"></i> Save
+                            </button>
+                            <a asp-action="ManageUsers" class="btn btn-outline-secondary">
+                                <i class="fa-solid fa-circle-left me-1"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

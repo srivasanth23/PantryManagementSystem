@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace PantryManagementSystem.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class InitalCreation : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -49,7 +49,7 @@ namespace PantryManagementSystem.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     PantryItemId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false, defaultValue: "Pending"),
@@ -84,7 +84,7 @@ namespace PantryManagementSystem.Migrations
             migrationBuilder.InsertData(
                 table: "Orders",
                 columns: new[] { "Id", "IssuedDate", "PantryItemId", "Quantity", "RequestDate", "UserId" },
-                values: new object[] { new Guid("aca1f837-fba7-42d2-ae01-7f25ccfc1653"), null, new Guid("91555176-1298-4383-8e3e-bb0695861ee7"), 2, new DateTime(2025, 9, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "20e32654-1f4f-4e36-8c1d-7a805d5218dd" });
+                values: new object[] { new Guid("aca1f837-fba7-42d2-ae01-7f25ccfc1653"), null, new Guid("91555176-1298-4383-8e3e-bb0695861ee7"), 2, new DateTime(2025, 9, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new Guid("20e32654-1f4f-4e36-8c1d-7a805d5218dd") });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Orders_PantryItemId",

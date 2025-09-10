@@ -12,8 +12,8 @@ using PantryManagementSystem.Data;
 namespace PantryManagementSystem.Migrations.AuthDb
 {
     [DbContext(typeof(AuthDbContext))]
-    [Migration("20250910034122_AuthInitials")]
-    partial class AuthInitials
+    [Migration("20250910064717_Inital Creation")]
+    partial class InitalCreation
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

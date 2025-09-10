@@ -6,7 +6,7 @@ using PantryManagementSystem.Repositories.Interfaces;
 
 namespace PantryManagementSystem.Controllers
 {
-    //[Authorize(Roles = "Admin,Staff")]
+    [Authorize(Roles = "Admin,Staff,User")]
     public class PantryItemController : Controller
     {
         private readonly IPantryItemRepository _repository;
@@ -16,11 +16,21 @@ namespace PantryManagementSystem.Controllers
             _repository = repository;
         }
 
-        [Authorize(Roles = "Admin,Staff,User")]
-        // GET: PantryItem
-        public async Task<IActionResult> Index()
+        // GET: PantryItem (with optional search)
+        [HttpGet]
+        public async Task<IActionResult> Index(string searchTerm = "")
         {
             var items = await _repository.GetAllAsync();
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                searchTerm = searchTerm.ToLower();
+                items = items.Where(i =>
+                    i.Name.ToLower().Contains(searchTerm) ||
+                    i.Category.ToLower().Contains(searchTerm)
+                ).ToList();
+            }
+
             var dtos = items.Select(i => new PantryItemReadDTO
             {
                 Id = i.Id,
@@ -31,11 +41,12 @@ namespace PantryManagementSystem.Controllers
                 ExpiryDate = i.ExpiryDate
             }).ToList();
 
+            ViewBag.SearchTerm = searchTerm;
             return View(dtos);
         }
 
-        [Authorize(Roles = "Admin,Staff,User")]
         // GET: PantryItem/Details/{id}
+        [HttpGet]
         public async Task<IActionResult> Details(Guid id)
         {
             var item = await _repository.GetByIdAsync(id);
@@ -54,16 +65,17 @@ namespace PantryManagementSystem.Controllers
             return View(dto);
         }
 
-        [Authorize(Roles = "Admin,Staff")]
         // GET: PantryItem/Create
+        [Authorize(Roles = "Admin,Staff")]
+        [HttpGet]
         public IActionResult Create()
         {
             ViewBag.Categories = GetCategories();
             return View();
         }
 
-        [Authorize(Roles = "Admin,Staff")]
         // POST: PantryItem/Create
+        [Authorize(Roles = "Admin,Staff")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(PantryItemCreateDTO dto)
@@ -74,7 +86,7 @@ namespace PantryManagementSystem.Controllers
                 return View(dto);
             }
 
-            await _repository.AddAsync(new PantryManagementSystem.Models.Domain.PantryItem
+            await _repository.AddAsync(new PantryItem
             {
                 Id = Guid.NewGuid(),
                 Name = dto.Name,
@@ -87,8 +99,9 @@ namespace PantryManagementSystem.Controllers
             return RedirectToAction("Index");
         }
 
-        [Authorize(Roles = "Admin,Staff")]
         // GET: PantryItem/Edit/{id}
+        [Authorize(Roles = "Admin,Staff")]
+        [HttpGet]
         public async Task<IActionResult> Edit(Guid id)
         {
             var item = await _repository.GetByIdAsync(id);
@@ -108,8 +121,8 @@ namespace PantryManagementSystem.Controllers
             return View(dto);
         }
 
-        [Authorize(Roles = "Admin,Staff")]
         // POST: PantryItem/Edit/{id}
+        [Authorize(Roles = "Admin,Staff")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Guid id, PantryItemUpdateDTO dto)
@@ -133,8 +146,9 @@ namespace PantryManagementSystem.Controllers
             return RedirectToAction("Index");
         }
 
-        [Authorize(Roles = "Admin,Staff")]
         // GET: PantryItem/Delete/{id}
+        [Authorize(Roles = "Admin,Staff")]
+        [HttpGet]
         public async Task<IActionResult> Delete(Guid id)
         {
             var item = await _repository.GetByIdAsync(id);
@@ -144,16 +158,15 @@ namespace PantryManagementSystem.Controllers
             return Ok();
         }
 
-
         // Helper method: predefined categories
         private List<string> GetCategories()
         {
             return new List<string>
-        {
-            "Beverage","Snacks","Biscuits","Juices","Dairy","Fruits",
-            "Vegetables","Bread","Condiments","Cereals","Chocolate",
-            "Coffee","Tea","Nuts","Soups","Sauces","Frozen","ReadyToEat","Miscellaneous"
-        };
+            {
+                "Beverage","Snacks","Biscuits","Juices","Dairy","Fruits",
+                "Vegetables","Bread","Condiments","Cereals","Chocolate",
+                "Coffee","Tea","Nuts","Soups","Sauces","Frozen","ReadyToEat","Miscellaneous"
+            };
         }
     }
 }
