@@ -1,0 +1,32 @@
+﻿@model List<PantryManagementSystem.Models.Domain.PantryItem>
+@{
+    ViewData["Title"] = "Browse Pantry Items";
+}
+
+<div class="container my-4">
+    <h2>Available Pantry Items</h2>
+    <div class="row row-cols-1 row-cols-md-3 g-4 mt-3">
+        @foreach (var item in Model)
+        {
+            <div class="col">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">@item.Name</h5>
+                        <p class="card-text"><strong>Category:</strong> @item.Category</p>
+                        <p class="card-text"><strong>Price:</strong> ₹@item.Price</p>
+                        <p class="card-text"><strong>Quantity Available:</strong> @item.Quantity</p>
+                        <p class="card-text"><strong>Expiry:</strong> @item.ExpiryDate.ToString("dd MMM yyyy")</p>
+
+                        <form asp-action="RequestItem" method="post" class="mt-2">
+                            <input type="hidden" name="pantryItemId" value="@item.Id" />
+                            <div class="input-group mb-2">
+                                <input type="number" name="quantity" class="form-control" min="1" max="@item.Quantity" value="1" required />
+                                <button type="submit" class="btn btn-success">Request</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

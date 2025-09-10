@@ -1,0 +1,123 @@
+﻿@* Staff Approve/issue *@
+
+@model List<PantryManagementSystem.Models.DTO.MyOrderDTO>
+@using PantryManagementSystem.Models.Enums
+@inject IHttpContextAccessor HttpContextAccessor
+
+@{
+    var user = HttpContextAccessor.HttpContext?.User;
+    var isAdminOrStaff = user.IsInRole("Admin") || user.IsInRole("Staff");
+
+    var pendingOrders = Model.Where(o => o.Status == "Pending").ToList();
+    var approvedOrders = Model.Where(o => o.Status == "Approved").ToList();
+}
+
+
+<div class="container my-4">
+    <h2 class="mb-4">My Orders</h2>
+
+    <div class="row">
+        <!-- ================= LEFT: Pending Orders ================= -->
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-warning text-white fw-bold">
+                    Pending Orders
+                </div>
+                <div class="card-body p-0">
+                    @if (!pendingOrders.Any())
+                    {
+                        <p class="p-3 mb-0">No pending orders.</p>
+                    }
+                    else
+                    {
+                        <table class="table table-striped table-hover mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Order Id</th>
+                                    <th>Item</th>
+                                    <th>Qty</th>
+                                    <th>Req Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var order in pendingOrders)
+                                {
+                                    <tr>
+                                        <td>@order.Id</td>
+                                        <td>@order.PantryItemName</td>
+                                        <td>@order.Quantity</td>
+                                        <td>@order.RequestDate.ToString("dd-MMM")</td>
+                                        <td>
+                                            @if (isAdminOrStaff)
+                                            {
+                                                <form asp-controller="Order" asp-action="Approve" method="post" class="d-inline">
+                                                    <input type="hidden" name="orderId" value="@order.Id" />
+                                                    <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                                                </form>
+
+                                                <form asp-controller="Order" asp-action="Deny" method="post" class="d-inline">
+                                                    <input type="hidden" name="orderId" value="@order.Id" />
+                                                    <button type="submit" class="btn btn-danger btn-sm">Deny</button>
+                                                </form>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= RIGHT: Approved Orders ================= -->
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-success text-white fw-bold">
+                    Approved Orders
+                </div>
+                <div class="card-body p-0">
+                    @if (!approvedOrders.Any())
+                    {
+                        <p class="p-3 mb-0">No approved orders.</p>
+                    }
+                    else
+                    {
+                        <table class="table table-striped table-hover mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Order Id</th>
+                                    <th>Item</th>
+                                    <th>Qty</th>
+                                    <th>Req Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var order in approvedOrders)
+                                {
+                                    <tr>
+                                        <td>@order.Id</td>
+                                        <td>@order.PantryItemName</td>
+                                        <td>@order.Quantity</td>
+                                        <td>@order.RequestDate.ToString("dd-MMM")</td>
+                                        <td>
+                                            @if (isAdminOrStaff)
+                                            {
+                                                <form asp-controller="Order" asp-action="Issue" method="post" class="d-inline">
+                                                    <input type="hidden" name="orderId" value="@order.Id" />
+                                                    <button type="submit" class="btn btn-primary btn-sm">Issue</button>
+                                                </form>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

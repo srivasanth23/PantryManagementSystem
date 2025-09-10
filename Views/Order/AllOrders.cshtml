@@ -1,0 +1,42 @@
+﻿@* Admin *@
+
+@model IEnumerable<PantryManagementSystem.Models.DTO.OrderReadDTO>
+
+<div class="container my-4">
+    <h2 class="mb-4">All Orders</h2>
+
+    <table class="table table-striped table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>Order ID</th>
+                <th>User ID</th>
+                <th>Item</th>
+                <th>Qty</th>
+                <th>Status</th>
+                <th>Req Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="7" class="text-center">No orders found</td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var order in Model)
+                {
+                    <tr>
+                        <td>@order.Id</td>
+                        <td>@order.UserId</td>
+                        <td>@order.PantryItemName</td>
+                        <td>@order.Quantity</td>
+                        <td>@order.Status</td>
+                        <td>@order.RequestDate.ToString("dd-MMM")</td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
