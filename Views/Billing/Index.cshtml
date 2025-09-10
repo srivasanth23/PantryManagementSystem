@@ -1,0 +1,61 @@
+﻿@model IEnumerable<PantryManagementSystem.Models.Domain.Billing>
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+
+@{
+    ViewData["Title"] = "All Bills";
+    var user = HttpContextAccessor.HttpContext?.User;
+    var isAdmin = user?.IsInRole("Admin") ?? false;
+    var isStaff = user?.IsInRole("Staff") ?? false;
+}
+
+<div class="container my-5">
+    <div class="card shadow-sm p-4">
+        <div class="card-header text-white text-center mb-3"
+             style="background: linear-gradient(135deg, #ff6a00, #ee0979); border-radius: 12px 12px 0 0;">
+            <h3>All Bills</h3>
+        </div>
+
+        @if (isStaff)
+        {
+            <div class="mb-3 text-end">
+                <a asp-action="Generate" class="btn btn-success">
+                    <i class="fa-solid fa-receipt me-1"></i> Generate Bill
+                </a>
+            </div>
+        }
+
+        <table class="table table-striped table-bordered text-center align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Bill Id</th>
+                    <th>User Email</th>
+                    <th>Month</th>
+                    <th>Total Amount</th>
+                    <th>Generated Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var bill in Model)
+                {
+                    <tr>
+                        <td>@bill.Id</td>
+                        <td>@bill.UserEmail</td>
+                        <td>@bill.Month</td>
+                        <td>₹@bill.TotalAmount</td>
+                        <td>@bill.GeneratedDate.ToString("dd-MMM-yyyy")</td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@bill.Id" class="btn btn-info btn-sm text-white me-2">
+                                <i class="fa-solid fa-eye me-1"></i> Show Bill
+                            </a>
+                            <a asp-action="ExportPdf" asp-route-id="@bill.Id" class="btn btn-danger btn-sm">
+                                <i class="fa-solid fa-file-pdf me-1"></i> PDF
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

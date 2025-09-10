@@ -1,0 +1,34 @@
+﻿@model List<PantryManagementSystem.Models.Domain.Billing>
+
+<div class="container my-5">
+    <h2>My Bills</h2>
+
+    <table class="table table-striped shadow-sm mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th>Month</th>
+                <th>Total Amount</th>
+                <th>Generated Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var bill in Model)
+            {
+                <tr>
+                    <td>@bill.Month</td>
+                    <td>₹@bill.TotalAmount</td>
+                    <td>@bill.GeneratedDate.ToString("dd MMM yyyy")</td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@bill.Id" class="btn btn-sm btn-info">
+                            <i class="fa-solid fa-eye"></i> View
+                        </a>
+                        <a asp-action="ExportPdf" asp-route-id="@bill.Id" class="btn btn-sm btn-danger">
+                            <i class="fa-solid fa-file-pdf"></i> PDF
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

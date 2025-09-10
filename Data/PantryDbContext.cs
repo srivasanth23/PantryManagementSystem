@@ -18,6 +18,10 @@ namespace PantryManagementSystem.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<Billing>()
+           .HasIndex(b => new { b.UserId, b.Month })
+           .IsUnique();
+
             // ✅ Store Enum as string in DB (easier to read than int values)
             modelBuilder
                 .Entity<Order>()
@@ -53,22 +57,25 @@ namespace PantryManagementSystem.Data
             var order = new Order
             {
                 Id = Guid.Parse("aca1f837-fba7-42d2-ae01-7f25ccfc1653"),
-                UserId = Guid.Parse("20e32654-1f4f-4e36-8c1d-7a805d5218dd"), 
+                UserId = Guid.Parse("20e32654-1f4f-4e36-8c1d-7a805d5218dd"),
                 PantryItemId = Guid.Parse("91555176-1298-4383-8e3e-bb0695861ee7"),
                 Quantity = 2,
-                Status = OrderStatus.Pending,
-                RequestDate = new DateTime(2025, 09, 01) 
+                Status = OrderStatus.Issued,                    // important
+                RequestDate = new DateTime(2025, 09, 01),
+                IssuedDate = new DateTime(2025, 09, 02)         // add this
             };
+
             modelBuilder.Entity<Order>().HasData(order);
 
             var billing = new Billing
             {
                 Id = Guid.Parse("c8f2e7c2-3af8-4a8a-91d1-28e5f5ffdb92"),
-                UserId = Guid.Parse("20e32654-1f4f-4e36-8c1d-7a805d5218dd"), 
-                Month = "Sep-2025",
-                TotalAmount = 40, // Example: user consumed ₹40 worth items
-                GeneratedDate = new DateTime(2025, 09, 05) 
+                UserId = Guid.Parse("20e32654-1f4f-4e36-8c1d-7a805d5218dd"),
+                Month = "Sep-2025",            // must match ParseExact("MMM-yyyy")
+                TotalAmount = 40m,             // decimal literal (not int)
+                GeneratedDate = new DateTime(2025, 09, 05)
             };
+
             modelBuilder.Entity<Billing>().HasData(billing);
         }
     }

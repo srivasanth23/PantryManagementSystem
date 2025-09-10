@@ -62,6 +62,7 @@ builder.Services.AddSession();
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 builder.Services.AddScoped<IPantryItemRepository, PantryItemRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IBillingRepository, BillingRepository>();
 
 var app = builder.Build();
 

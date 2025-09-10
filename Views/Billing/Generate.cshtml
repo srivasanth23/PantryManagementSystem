@@ -1,0 +1,34 @@
+﻿@{
+    ViewData["Title"] = "Generate Bill";
+}
+
+<div class="container my-5">
+    <div class="card shadow-sm p-4">
+        <div class="card-header text-white text-center mb-3"
+             style="background: linear-gradient(135deg, #43cea2, #185a9d); border-radius: 12px 12px 0 0;">
+            <h3>Generate Bill</h3>
+        </div>
+
+        <form asp-action="Generate" method="post">
+            <div class="mb-3">
+                <label for="userId" class="form-label">Select User</label>
+                <select name="userId" class="form-control" required>
+                    <option value="">-- Select User Email --</option>
+                    @foreach (var user in ViewBag.Users)
+                    {
+                        <option value="@user.Id">@user.Email</option>
+                    }
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="month" class="form-label">Select Month</label>
+                <input type="month" name="month" class="form-control" required />
+            </div>
+
+            <button type="submit" class="btn btn-success">
+                <i class="fa-solid fa-receipt me-1"></i> Generate Bill
+            </button>
+        </form>
+    </div>
+</div>
