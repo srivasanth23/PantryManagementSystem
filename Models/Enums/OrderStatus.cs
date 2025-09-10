@@ -4,6 +4,7 @@
     {
         Pending,
         Approved,
-        Issued
+        Issued,
+        Denied,
     }
 }

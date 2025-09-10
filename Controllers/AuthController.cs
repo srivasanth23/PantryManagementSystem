@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using PantryManagementSystem.Models.DTO;
 using PantryManagementSystem.Repositories;
+using PantryManagementSystem.Repositories.Interfaces;
 using System.Security.Claims;
 
 namespace PantryManagementSystem.Controllers
@@ -20,9 +21,15 @@ namespace PantryManagementSystem.Controllers
             _tokenRepo = tokenRepo;
         }
 
+        // -----------------------------
+        // Register GET
+        // -----------------------------
         [HttpGet]
         public IActionResult Register() => View();
 
+        // -----------------------------
+        // Register POST
+        // -----------------------------
         [HttpPost]
         public async Task<IActionResult> Register(RegisterRequestDTO dto)
         {
@@ -44,9 +51,15 @@ namespace PantryManagementSystem.Controllers
             return View(dto);
         }
 
+        // -----------------------------
+        // Login GET
+        // -----------------------------
         [HttpGet]
         public IActionResult Login() => View();
 
+        // -----------------------------
+        // Login POST
+        // -----------------------------
         [HttpPost]
         public async Task<IActionResult> Login(LoginRequestDTO dto)
         {
@@ -57,16 +70,27 @@ namespace PantryManagementSystem.Controllers
             {
                 var roles = await _userManager.GetRolesAsync(user);
 
-                // Cookie authentication
-                var claims = new List<Claim> { new Claim(ClaimTypes.Name, user.UserName) };
+                // ✅ Add NameIdentifier claim (Identity User Id)
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.NameIdentifier, user.Id),
+                    new Claim(ClaimTypes.Name, user.UserName)
+                };
+
                 claims.AddRange(roles.Select(r => new Claim(ClaimTypes.Role, r)));
 
                 var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
 
-                // JWT token for API
+                // JWT token for API usage
                 var jwt = _tokenRepo.CreateJWTToken(user, roles.ToList());
-                Response.Cookies.Append("JWTToken", jwt, new CookieOptions { HttpOnly = true, Secure = false, SameSite = SameSiteMode.Strict, Expires = DateTime.UtcNow.AddHours(1) });
+                Response.Cookies.Append("JWTToken", jwt, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = false, // Set true in production
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTime.UtcNow.AddHours(1)
+                });
 
                 TempData["Message"] = $"✅ Logged in! Roles: {string.Join(", ", roles)}";
                 return RedirectToAction("Index", "Home");
@@ -76,6 +100,9 @@ namespace PantryManagementSystem.Controllers
             return View(dto);
         }
 
+        // -----------------------------
+        // Logout
+        // -----------------------------
         [HttpGet]
         public async Task<IActionResult> Logout()
         {

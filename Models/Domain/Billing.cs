@@ -19,6 +19,5 @@ namespace PantryManagementSystem.Models.Domain
 
         [Required]
         public DateTime GeneratedDate { get; set; }
-
     }
 }
