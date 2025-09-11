@@ -69,55 +69,57 @@
             {
                 <div class="category-section p-3 mb-4 rounded">
                     <h4 class="mb-3">@category</h4>
-                    <div class="row row-cols-1 row-cols-md-3 g-4 mb-4">
+
+                    <!-- Horizontal Scroll Container -->
+                    <div class="d-flex overflow-auto gap-3 pb-2">
                         @foreach (var item in itemsInCategory)
                         {
                             var daysLeft = (item.ExpiryDate - DateTime.Now).TotalDays;
                             bool lowStock = item.Quantity <= 5;
                             bool expirySoon = daysLeft <= 10;
 
-                            <div class="col">
-                                <div class="card card-custom h-100 shadow-sm position-relative">
-                                    <!-- Quantity Badge -->
-                                    <span class="position-absolute top-0 end-0 badge rounded-pill m-2 @(item.Quantity > 0 ? "bg-success" : "bg-danger")">
-                                        @item.Quantity
-                                    </span>
+                            <div class="card card-custom shadow-sm position-relative"
+                                 style="min-width: 250px; flex: 0 0 auto;">
 
-                                    <!-- Category Badge -->
-                                    <span class="position-absolute top-0 start-0 badge rounded-pill m-2"
-                                          style="background: linear-gradient(135deg, #36d1dc, #5b86e5); color:white;">
-                                        @item.Category
-                                    </span>
+                                <!-- Quantity Badge -->
+                                <span class="position-absolute top-0 end-0 badge rounded-pill m-2 @(item.Quantity > 0 ? "bg-success" : "bg-danger")">
+                                    @item.Quantity
+                                </span>
 
-                                    <div class="card-body">
-                                        <h5 class="card-title mt-4">@item.Name</h5>
-                                        <p class="card-text"><strong>Price:</strong> ₹@item.Price</p>
-                                        <p class="card-text"><strong>Expiry:</strong> @item.ExpiryDate.ToString("dd MMM yyyy")</p>
+                                <!-- Category Badge -->
+                                <span class="position-absolute top-0 start-0 badge rounded-pill m-2"
+                                      style="background: linear-gradient(135deg, #36d1dc, #5b86e5); color:white;">
+                                    @item.Category
+                                </span>
 
-                                        @if (expirySoon)
-                                        {
-                                            <span class="badge bg-warning me-1">Expiry Soon</span>
-                                        }
-                                        @if (lowStock)
-                                        {
-                                            <span class="badge bg-danger">Low Stock</span>
-                                        }
-                                    </div>
+                                <div class="card-body">
+                                    <h5 class="card-title mt-4">@item.Name</h5>
+                                    <p class="card-text"><strong>Price:</strong> ₹@item.Price</p>
+                                    <p class="card-text"><strong>Expiry:</strong> @item.ExpiryDate.ToString("dd MMM yyyy")</p>
 
-                                    <div class="card-footer d-flex justify-content-center">
-                                        <button type="button" class="btn btn-success btn-sm rounded-pill px-3"
-                                                onclick="location.href='@Url.Action("RequestOrder", "Order", new { id = item.Id })'">
-                                            <i class="fa-solid fa-cart-plus me-1"></i> Request
-                                        </button>
-                                    </div>
+                                    @if (expirySoon)
+                                    {
+                                        <span class="badge bg-warning me-1">Expiry Soon</span>
+                                    }
+                                    @if (lowStock)
+                                    {
+                                        <span class="badge bg-danger">Low Stock</span>
+                                    }
+                                </div>
+
+                                <div class="card-footer d-flex justify-content-center">
+                                    <button type="button" class="btn btn-success btn-sm rounded-pill px-3"
+                                            onclick="location.href='@Url.Action("RequestOrder", "Order", new { id = item.Id })'">
+                                        <i class="fa-solid fa-cart-plus me-1"></i> Request
+                                    </button>
                                 </div>
                             </div>
                         }
                     </div>
                 </div>
-
             }
         }
+
     }
     else if (isStaff)
     {

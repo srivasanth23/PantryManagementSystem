@@ -12,8 +12,8 @@ using PantryManagementSystem.Data;
 namespace PantryManagementSystem.Migrations
 {
     [DbContext(typeof(PantryDbContext))]
-    [Migration("20250910112535_Initial")]
-    partial class Initial
+    [Migration("20250911134715_InitialCReation")]
+    partial class InitialCReation
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

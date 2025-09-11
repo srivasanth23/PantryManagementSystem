@@ -158,6 +158,22 @@ namespace PantryManagementSystem.Controllers
             return Ok();
         }
 
+        public async Task<IActionResult> SearchFunctinallity(string searchTerm)
+        {
+            var items = await _repository.GetAllAsync();
+
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                items = items.Where(x =>
+                    x.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    x.Category.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+
+            ViewBag.SearchTerm = searchTerm;
+            return View(items);
+        }
+
         // Helper method: predefined categories
         private List<string> GetCategories()
         {

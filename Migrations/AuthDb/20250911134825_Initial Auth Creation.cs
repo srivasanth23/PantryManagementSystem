@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace PantryManagementSystem.Migrations.AuthDb
 {
     /// <inheritdoc />
-    public partial class Auth : Migration
+    public partial class InitialAuthCreation : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

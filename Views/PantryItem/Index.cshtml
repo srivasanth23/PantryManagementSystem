@@ -12,15 +12,23 @@
 }
 
 <div class="container container-custom my-4">
+    <!-- ✅ Search bar + Add New Item -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Pantry Items</h2>
 
+        <form method="get" asp-action="Index" class="d-flex">
+            <input type="text" name="searchTerm" value="@ViewBag.SearchTerm"
+                   class="form-control me-2" placeholder="Search items..." />
+            <button type="submit" class="btn btn-outline-primary">Search</button>
+        </form>
+
         @if (isAdmin)
         {
-            <a asp-action="Create" class="btn btn-primary">Add New Item</a>
+            <a asp-action="Create" class="btn btn-primary ms-2">Add New Item</a>
         }
     </div>
 
+    <!-- ✅ Items Grid -->
     <div class="row row-cols-1 row-cols-md-3 g-4">
         @foreach (var item in Model)
         {
@@ -57,7 +65,7 @@
                     </div>
 
                     <div class="card-footer d-flex justify-content-center gap-2">
-                        @* Role-based actions *@
+                        <!-- Role-based actions -->
                         @if (isAdmin)
                         {
                             <button type="button" class="btn btn-primary btn-sm rounded-pill px-3"
@@ -100,7 +108,7 @@
     }
 </div>
 
-<!-- Delete Confirmation Modal -->
+<!-- ✅ Delete Confirmation Modal -->
 @if (isAdmin)
 {
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">

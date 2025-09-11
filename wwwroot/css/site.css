@@ -50,3 +50,17 @@ body {
     background-color: #e9f5ff; /* light blue */
     border-radius: 12px;
 }
+
+.d-flex.overflow-auto {
+    scroll-behavior: smooth;
+    scrollbar-width: thin; /* Firefox */
+}
+
+    .d-flex.overflow-auto::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    .d-flex.overflow-auto::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, #36d1dc, #5b86e5);
+        border-radius: 4px;
+    }
