@@ -1,34 +1,71 @@
 ﻿@model List<PantryManagementSystem.Models.Domain.Billing>
 
-<div class="container my-5">
-    <h2>My Bills</h2>
+@{
+    ViewData["Title"] = "My Bills";
+}
 
-    <table class="table table-striped shadow-sm mt-3">
-        <thead class="table-dark">
-            <tr>
-                <th>Month</th>
-                <th>Total Amount</th>
-                <th>Generated Date</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var bill in Model)
-            {
-                <tr>
-                    <td>@bill.Month</td>
-                    <td>₹@bill.TotalAmount</td>
-                    <td>@bill.GeneratedDate.ToString("dd MMM yyyy")</td>
-                    <td>
-                        <a asp-action="Details" asp-route-id="@bill.Id" class="btn btn-sm btn-info">
-                            <i class="fa-solid fa-eye"></i> View
-                        </a>
-                        <a asp-action="ExportPdf" asp-route-id="@bill.Id" class="btn btn-sm btn-danger">
-                            <i class="fa-solid fa-file-pdf"></i> PDF
-                        </a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+<div class="container container-custom my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-11">
+            <div class="card shadow-sm card-custom">
+                <!-- Card Header -->
+                <div class="card-header text-white text-center mb-3"
+                     style="background: linear-gradient(135deg, #11998e, #38ef7d); border-radius: 12px 12px 0 0;">
+                    <h3>My Bills</h3>
+                </div>
+
+                <div class="card-body">
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success">@TempData["Success"]</div>
+                    }
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger">@TempData["Error"]</div>
+                    }
+
+                    <!-- Bills Table -->
+                    <table class="table table-hover align-middle text-center">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Month</th>
+                                <th>Total Amount</th>
+                                <th>Generated Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model == null || !Model.Any())
+                            {
+                                <tr>
+                                    <td colspan="4" class="text-muted">No bills found.</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var bill in Model)
+                                {
+                                    <tr>
+                                        <td>@bill.Month</td>
+                                        <td>₹@bill.TotalAmount</td>
+                                        <td>@bill.GeneratedDate.ToString("dd-MMM-yyyy")</td>
+                                        <td>
+                                            <a asp-action="Details" asp-route-id="@bill.Id"
+                                               class="btn btn-sm btn-info">
+                                                <i class="fa-solid fa-eye"></i> View
+                                            </a>
+                                            <a asp-action="DownloadPdf" asp-route-id="@bill.Id"
+                                               class="btn btn-sm btn-danger">
+                                                <i class="fa-solid fa-file-pdf"></i> PDF
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div> <!-- card-body -->
+            </div> <!-- card -->
+        </div> <!-- col -->
+    </div> <!-- row -->
 </div>

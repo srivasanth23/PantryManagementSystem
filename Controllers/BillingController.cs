@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using PantryManagementSystem.Models.Domain;
 using PantryManagementSystem.Repositories.Interfaces;
+using Rotativa.AspNetCore;
 
 namespace PantryManagementSystem.Controllers
 {
@@ -25,7 +26,7 @@ namespace PantryManagementSystem.Controllers
             return View(list);
         }
 
-        [Authorize(Roles = "Admin,Staff")]
+        [Authorize(Roles = "Admin,Staff,User")]
         public async Task<IActionResult> Details(Guid id)
         {
             var bill = await repo.GetByIdAsync(id);
@@ -33,13 +34,66 @@ namespace PantryManagementSystem.Controllers
             return View(bill);
         }
 
-        [Authorize(Roles = "User")]
-        public async Task<IActionResult> UserBills(Guid userId)
+        [Authorize(Roles = "Admin,Staff,User")]
+        public async Task<IActionResult> DownloadPdf(Guid id)
         {
-            var list = await repo.GetByUserAsync(userId);
-            ViewBag.UserId = userId;
+            var bill = await repo.GetByIdAsync(id);
+            if (bill == null)
+                return NotFound();
+
+            // Define file name & path
+            var fileName = $"Bill_{bill.Month}_{bill.UserEmail}.pdf";
+            var savePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "PdfBills", fileName);
+
+            // Ensure folder exists
+            var folder = Path.GetDirectoryName(savePath);
+            if (!Directory.Exists(folder))
+                Directory.CreateDirectory(folder);
+
+            // Generate PDF as byte array
+            var pdfResult = new Rotativa.AspNetCore.ViewAsPdf("BillPdf", bill)
+            {
+                FileName = fileName,
+                PageSize = Rotativa.AspNetCore.Options.Size.A4,
+                PageOrientation = Rotativa.AspNetCore.Options.Orientation.Portrait
+            };
+
+            var pdfBytes = await pdfResult.BuildFile(ControllerContext);
+
+            // Save to folder
+            await System.IO.File.WriteAllBytesAsync(savePath, pdfBytes);
+
+            // Return the PDF to browser
+            return File(pdfBytes, "application/pdf", fileName);
+        }
+
+
+
+        //[Authorize(Roles = "User,Staff,Admin")]
+        //public async Task<IActionResult> UserBills(Guid userId)
+        //{
+        //    var list = await repo.GetByUserAsync(userId);
+        //    ViewBag.UserId = userId;
+        //    return View(list);
+        //}
+        [Authorize(Roles = "User,Staff,Admin")]
+        public async Task<IActionResult> UserBills(Guid? userId)
+        {
+            if (userId == null || userId == Guid.Empty)
+            {
+                // use the logged-in user's Id
+                var identityUser = await _userManager.GetUserAsync(User);
+                if (identityUser == null)
+                    return Unauthorized();
+
+                userId = Guid.Parse(identityUser.Id);
+            }
+
+            var list = await repo.GetByUserAsync(userId.Value);
+            ViewBag.UserId = userId.Value;
             return View(list);
         }
+
 
         [Authorize(Roles = "Staff")]
         [HttpGet]

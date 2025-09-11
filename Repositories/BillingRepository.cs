@@ -18,7 +18,6 @@ namespace PantryManagementSystem.Repositories
             _authDb = authDb;
         }
 
-        // ✅ Get all bills with UserEmail stitched in memory
         public async Task<IEnumerable<Billing>> GetAllAsync()
         {
             var bills = await _db.Billings
@@ -36,7 +35,6 @@ namespace PantryManagementSystem.Repositories
             return bills;
         }
 
-        // ✅ Get bills for a single user
         public async Task<IEnumerable<Billing>> GetByUserAsync(Guid userId)
         {
             var bills = await _db.Billings
@@ -54,7 +52,6 @@ namespace PantryManagementSystem.Repositories
             return bills;
         }
 
-        // ✅ Get a single bill by Id
         public async Task<Billing?> GetByIdAsync(Guid id)
         {
             var bill = await _db.Billings.FirstOrDefaultAsync(b => b.Id == id);
@@ -63,8 +60,42 @@ namespace PantryManagementSystem.Repositories
             var user = await _authDb.Users.FirstOrDefaultAsync(u => u.Id == bill.UserId.ToString());
             bill.UserEmail = user?.Email ?? "Unknown";
 
+            // find start & end of this bill's month
+            var (start, end) = ParseMonth(bill.Month);
+
+            // get issued orders for this user within that month
+            bill.Orders = await (from o in _db.Orders
+                                 join p in _db.PantryItems on o.PantryItemId equals p.Id
+                                 where o.UserId == bill.UserId
+                                    && o.Status == OrderStatus.Issued
+                                    && o.IssuedDate.HasValue
+                                    && o.IssuedDate.Value >= start
+                                    && o.IssuedDate.Value < end
+                                 select new Order
+                                 {
+                                     Id = o.Id,
+                                     UserId = o.UserId,
+                                     PantryItemId = o.PantryItemId,
+                                     PantryItem = p,
+                                     Quantity = o.Quantity,
+                                     Status = o.Status,
+                                     RequestDate = o.RequestDate,
+                                     IssuedDate = o.IssuedDate
+                                 }).ToListAsync();
+
             return bill;
         }
+
+        //public async Task<Billing?> GetByIdAsync(Guid id)
+        //{
+        //    var bill = await _db.Billings.FirstOrDefaultAsync(b => b.Id == id);
+        //    if (bill == null) return null;
+
+        //    var user = await _authDb.Users.FirstOrDefaultAsync(u => u.Id == bill.UserId.ToString());
+        //    bill.UserEmail = user?.Email ?? "Unknown";
+
+        //    return bill;
+        //}
 
         public async Task AddAsync(Billing billing)
         {
@@ -74,38 +105,44 @@ namespace PantryManagementSystem.Repositories
 
         public async Task DeleteAsync(Guid id)
         {
-            var x = await _db.Billings.FindAsync(id);
-            if (x == null) return;
-            _db.Billings.Remove(x);
+            var bill = await _db.Billings.FindAsync(id);
+            if (bill == null) return;
+
+            _db.Billings.Remove(bill);
             await _db.SaveChangesAsync();
         }
-
-        // ✅ Generate bill logic stays same
         public async Task<Billing> GenerateForUserMonthAsync(Guid userId, string monthLabel)
         {
             var key = NormalizeMonth(monthLabel);
-            var (start, end) = ParseMonth(key);
+            var (start, _) = ParseMonth(key); // we just need the year & month
 
+            int targetYear = start.Year;
+            int targetMonth = start.Month;
+
+            // Calculate monthly total for this user
             var total = await (from o in _db.Orders
                                join p in _db.PantryItems on o.PantryItemId equals p.Id
+                               let effectiveDate = (DateTime?)(o.IssuedDate ?? o.RequestDate)
                                where o.UserId == userId
                                   && o.Status == OrderStatus.Issued
-                                  && o.IssuedDate.HasValue
-                                  && o.IssuedDate.Value >= start
-                                  && o.IssuedDate.Value < end
+                                  && effectiveDate.Value.Year == targetYear
+                                  && effectiveDate.Value.Month == targetMonth
                                select p.Price * o.Quantity)
-                              .SumAsync(x => (decimal?)x) ?? 0m;
+                  .SumAsync(x => (decimal?)x) ?? 0m;
 
+
+            // Check if bill already exists for that month
             var bill = await _db.Billings
                 .FirstOrDefaultAsync(b => b.UserId == userId && b.Month == key);
 
-            if (bill is null)
+            if (bill == null)
             {
+                // create new bill for this month
                 bill = new Billing
                 {
                     Id = Guid.NewGuid(),
                     UserId = userId,
-                    Month = key,
+                    Month = key,                // e.g. "Aug-2025"
                     TotalAmount = total,
                     GeneratedDate = DateTime.UtcNow
                 };
@@ -113,6 +150,7 @@ namespace PantryManagementSystem.Repositories
             }
             else
             {
+                // update existing bill (same month + user)
                 bill.TotalAmount = total;
                 bill.GeneratedDate = DateTime.UtcNow;
                 _db.Billings.Update(bill);
@@ -120,27 +158,76 @@ namespace PantryManagementSystem.Repositories
 
             await _db.SaveChangesAsync();
 
-            // Attach email
+            // Attach User Email for display
             var user = await _authDb.Users.FirstOrDefaultAsync(u => u.Id == bill.UserId.ToString());
             bill.UserEmail = user?.Email ?? "Unknown";
 
             return bill;
         }
 
+
+        //public async Task<Billing> GenerateForUserMonthAsync(Guid userId, string monthLabel)
+        //{
+        //    var key = NormalizeMonth(monthLabel);
+        //    var (start, end) = ParseMonth(key);
+
+        //    // Calculate monthly total for this user
+        //    var total = await (from o in _db.Orders
+        //                       join p in _db.PantryItems on o.PantryItemId equals p.Id
+        //                       where o.UserId == userId
+        //                          && o.Status == OrderStatus.Issued
+        //                          && ((o.IssuedDate ?? o.RequestDate) >= start)
+        //                          && ((o.IssuedDate ?? o.RequestDate) < end)
+        //                       select p.Price * o.Quantity)
+        //          .SumAsync(x => (decimal?)x) ?? 0m;
+
+
+        //    // Check if bill already exists for that month
+        //    var bill = await _db.Billings
+        //        .FirstOrDefaultAsync(b => b.UserId == userId && b.Month == key);
+
+        //    if (bill == null)
+        //    {
+        //        // create new bill for this month
+        //        bill = new Billing
+        //        {
+        //            Id = Guid.NewGuid(),
+        //            UserId = userId,
+        //            Month = key,                // e.g. "Aug-2025"
+        //            TotalAmount = total,
+        //            GeneratedDate = DateTime.UtcNow
+        //        };
+        //        _db.Billings.Add(bill);
+        //    }
+        //    else
+        //    {
+        //        // update existing bill (same month + user)
+        //        bill.TotalAmount = total;
+        //        bill.GeneratedDate = DateTime.UtcNow;
+        //        _db.Billings.Update(bill);
+        //    }
+
+        //    await _db.SaveChangesAsync();
+
+        //    // Attach User Email for display
+        //    var user = await _authDb.Users.FirstOrDefaultAsync(u => u.Id == bill.UserId.ToString());
+        //    bill.UserEmail = user?.Email ?? "Unknown";
+
+        //    return bill;
+        //}
+
+
+
+
+        private static readonly string[] MonthFormats = { "MMM-yyyy", "MMMM-yyyy", "yyyy-MM", "MM-yyyy" };
         private static string NormalizeMonth(string label)
         {
-            label = (label ?? "").Trim();
-
-            if (label.StartsWith("Sept-", StringComparison.OrdinalIgnoreCase))
-                label = "Sep-" + label.Substring(5);
-
-            var formats = new[] { "MMM-yyyy", "MMMM-yyyy" };
-            if (!DateTime.TryParseExact(label, formats, CultureInfo.InvariantCulture,
-                                        DateTimeStyles.None, out var d))
-                d = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
-
-            return d.ToString("MMM-yyyy", CultureInfo.InvariantCulture);
+            if (!DateTime.TryParseExact(label.Trim(), MonthFormats,
+                CultureInfo.InvariantCulture, DateTimeStyles.None, out var dt))
+                dt = DateTime.Parse(label, CultureInfo.InvariantCulture);
+            return dt.ToString("MMM-yyyy", CultureInfo.InvariantCulture);
         }
+
 
         private static (DateTime start, DateTime end) ParseMonth(string canonical)
         {
