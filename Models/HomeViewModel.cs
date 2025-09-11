@@ -8,8 +8,8 @@ namespace PantryManagementSystem.Models.ViewModels
         public List<PantryItem> LowStockItems { get; set; } = new();
 
         // Staff Dashboard enhancements
-        public List<PantryItem> AllItems { get; set; } = new();        
-        public List<PantryItem> ExpiringItems { get; set; } = new();   
+        public List<PantryItem> AllItems { get; set; } = new();
+        public List<PantryItem> ExpiringItems { get; set; } = new();
 
         // Admin stats
         public int TotalOrders { get; set; }

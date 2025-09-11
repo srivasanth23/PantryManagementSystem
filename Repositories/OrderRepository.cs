@@ -140,7 +140,6 @@ namespace PantryManagementSystem.Repositories
                 .ToListAsync();
         }
 
-
         public async Task<Order> DenyOrderAsync(Guid orderId)
         {
             var order = await _context.Orders.Include(o => o.PantryItem).FirstOrDefaultAsync(o => o.Id == orderId);
@@ -175,6 +174,5 @@ namespace PantryManagementSystem.Repositories
                 .FirstOrDefaultAsync(o => o.Id == orderId);
 
         }
-
     }
 }

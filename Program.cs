@@ -7,6 +7,7 @@ using PantryManagementSystem.Repositories;
 using PantryManagementSystem.Repositories.Interfaces;
 using System.Security.Claims;
 using System.Text;
+using Rotativa.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -62,8 +63,11 @@ builder.Services.AddSession();
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 builder.Services.AddScoped<IPantryItemRepository, PantryItemRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IBillingRepository, BillingRepository>();
 
 var app = builder.Build();
+
+app.UseRotativa();
 
 // Configure middleware
 if (!app.Environment.IsDevelopment())

@@ -222,7 +222,7 @@ namespace PantryManagementSystem.Controllers
                 return BadRequest("Order cannot be issued");
 
             TempData["Success"] = "Order issued successfully!";
-            return RedirectToAction("AllOrders");
+            return RedirectToAction("MyOrders");
         }
 
         public async Task<IActionResult> UserOrdersHistory()

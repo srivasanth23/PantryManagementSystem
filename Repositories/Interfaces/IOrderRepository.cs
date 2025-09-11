@@ -26,8 +26,6 @@ namespace PantryManagementSystem.Repositories.Interfaces
         // Get all orders for staff view
         Task<IEnumerable<MyOrderDTO>> GetAllOrdersForStaffAsync();
 
-
-
         // Approve an order
         Task<Order> ApproveOrderAsync(Guid orderId);
 

@@ -1,0 +1,55 @@
+﻿@{
+    ViewData["Title"] = "Generate Bill";
+}
+
+<div class="container container-custom my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-sm card-custom">
+                <!-- Card Header -->
+                <div class="card-header text-white text-center mb-3"
+                     style="background: linear-gradient(135deg, #6a11cb, #2575fc); border-radius: 12px 12px 0 0;">
+                    <h3>Generate Bill</h3>
+                </div>
+
+                <div class="card-body">
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success">@TempData["Success"]</div>
+                    }
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger">@TempData["Error"]</div>
+                    }
+
+                    <form asp-action="Generate" method="post">
+                        <!-- Select User -->
+                        <div class="mb-3">
+                            <label for="userId" class="form-label fw-bold">Select User</label>
+                            <select name="userId" class="form-control" required>
+                                <option value="">-- Select User Email --</option>
+                                @foreach (var user in ViewBag.Users)
+                                {
+                                    <option value="@user.Id">@user.Email</option>
+                                }
+                            </select>
+                        </div>
+
+                        <!-- Select Month -->
+                        <div class="mb-3">
+                            <label for="month" class="form-label fw-bold">Select Month</label>
+                            <input type="month" name="month" class="form-control" required />
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-success px-4">
+                                <i class="fa-solid fa-receipt me-1"></i> Generate Bill
+                            </button>
+                        </div>
+                    </form>
+                </div> <!-- card-body -->
+            </div> <!-- card -->
+        </div> <!-- col -->
+    </div> <!-- row -->
+</div>

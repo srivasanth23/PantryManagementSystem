@@ -1,0 +1,86 @@
+﻿@model PantryManagementSystem.Models.Domain.Billing
+
+<div class="container container-custom my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-sm card-custom">
+                <!-- Card Header -->
+                <div class="card-header text-white text-center mb-3"
+                     style="background: linear-gradient(135deg, #6a11cb, #2575fc); border-radius: 12px 12px 0 0;">
+                    <h3>Bill Details</h3>
+                </div>
+
+                <div class="card-body">
+                    <!-- Bill Info -->
+                    <dl class="row">
+                        <dt class="col-sm-3">Month</dt>
+                        <dd class="col-sm-9">@Model.Month</dd>
+
+                        <dt class="col-sm-3">User</dt>
+                        <dd class="col-sm-9">@Model.UserEmail</dd>
+
+                        <dt class="col-sm-3">Total Amount</dt>
+                        <dd class="col-sm-9"><strong>₹@Model.TotalAmount</strong></dd>
+
+                        <dt class="col-sm-3">Generated</dt>
+                        <dd class="col-sm-9">@Model.GeneratedDate.ToString("dd MMM yyyy, HH:mm")</dd>
+                    </dl>
+
+                    <!-- Orders Table -->
+                    @if (Model.Orders != null && Model.Orders.Any())
+                    {
+                        <h5 class="mt-4 mb-3">Orders in this Bill</h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle text-center">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Item</th>
+                                        <th>Quantity</th>
+                                        <th>Price (₹)</th>
+                                        <th>Total (₹)</th>
+                                        <th>Issued Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var order in Model.Orders)
+                                    {
+                                        <tr>
+                                            <td>@order.PantryItem?.Name</td>
+                                            <td>@order.Quantity</td>
+                                            <td>@order.PantryItem?.Price</td>
+                                            <td>@(order.PantryItem?.Price * order.Quantity)</td>
+                                            <td>@order.IssuedDate?.ToString("dd MMM yyyy")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning mt-3">
+                            No issued orders found for this billing period.
+                        </div>
+                    }
+
+                    <!-- Action Buttons -->
+                    <div class="mt-4 d-flex flex-wrap gap-2">
+                        @if (User.IsInRole("User"))
+                        {
+                            <a asp-action="UserBills" class="btn btn-secondary">Back</a>
+                        }
+                        else
+                        {
+                            <a asp-action="Index" class="btn btn-secondary">Back</a>
+                        }
+
+                        <a asp-action="UserBills" asp-route-userId="@Model.UserId" class="btn btn-primary">See User Bills</a>
+                        <a asp-action="DownloadPdf" asp-route-id="@Model.Id" class="btn btn-success">Download PDF</a>
+                        <form asp-action="Delete" method="post" asp-route-id="@Model.Id" class="d-inline">
+                        </form>
+                    </div>
+                </div> <!-- card-body -->
+            </div> <!-- card -->
+        </div> <!-- col -->
+    </div> <!-- row -->
+</div>
